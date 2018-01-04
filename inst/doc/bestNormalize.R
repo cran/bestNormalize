@@ -2,49 +2,31 @@
 knitr::opts_chunk$set(echo = TRUE, fig.height = 5, fig.width = 7)
 library(bestNormalize)
 
-## ---- echo = FALSE-------------------------------------------------------
+## ---- echo = FALSE, warning = FALSE--------------------------------------
 
 x <- iris$Petal.Width
-old_points <- x
+on <- orderNorm(x)
+xx <- seq(min(x) - 1, max(x) + 1, length = 1000)
+yy <- predict(on, xx)
+r <- (rank(x) / (length(x) + 1))
+f  <- suppressWarnings(glm(r ~ x, family = "binomial"))
+p <- qnorm(predict(f, newdata = data.frame(x = xx), type = 'response'))
 
-x_t <- qnorm(rank(old_points, na.last = 'keep') / (length(old_points) + 1))
-plot(old_points, x_t, main = "The orderNorm Transformation", 
-     pch = 20, cex = 1, xlim = c(-.5, 3), ylim = c(-3, 3),
-     xlab = "Original Value", ylab = "Transformed Value")
-abline(h = 0, v = 0, lty = 3)
-
-# Fit and predictions for plot
-fit1 <- lm(x_t ~ old_points)
-x_indomain <- seq(min(old_points), max(old_points), length = 100) 
-x_low <- seq(-.5, min(old_points), length = 100)
-x_high <- seq(max(old_points), 3, length = 100)
-
-y_indomain <- predict(fit1, newdata = data.frame(old_points = x_indomain))
-y_low <- predict(fit1, newdata = data.frame(old_points = x_low))
-y_high <- predict(fit1, newdata = data.frame(old_points = x_high))
-
-lines(x = x_indomain, y_indomain)
-lines(x = x_low, y = y_low, lty = 2)
-lines(x = x_high, y = y_high, lty = 2)
-points(x = range(old_points), y = range(y_indomain), pch = 1, col = 1, cex = 1.5)
-
-# Add extrapolated 
-y_low_extra <- predict(fit1, newdata = data.frame(old_points = x_low)) - (min(predict(fit1)) - min(x_t))
-y_high_extra <- predict(fit1, newdata = data.frame(old_points = x_high)) - (max(predict(fit1)) - max(x_t))
-lines(x = x_low, y = y_low_extra, lwd = 2, col = 'slateblue')
-lines(x = x_high, y = y_high_extra, lwd = 2, col = 'slateblue')
-
-# Add interpolated 
-approx1 <- approx(old_points, x_t, xout = x_indomain, rule = 1)
-lines(approx1 , col = 'slateblue', lwd = 2)
+plot(x, on$x.t, pch = 20, xlim = range(xx), ylim = range(p, yy), main = "ORQ transformation",
+      xlab = "Original Value", ylab = "Transformed Value")
+lines(xx, p, col = '1', lwd = 1, lty =2)
+lines(xx, yy, col = 'slateblue', lwd = 2)
 
 # Add legend
 legend('bottomright', 
        c('Original data', 'Tranformed values for new data', 
-         'Linear approximation', 'Extrapolation'), 
-       bty = 'n', lty = c(0, 1, 1, 2), lwd = c(0, 2,1,1), 
-       pch = c(20, NA, NA, NA), 
+         'Approximation for Extrapolation'), 
+       bty = 'n', lty = c(0, 1, 2), lwd = c(0, 2,1), 
+       pch = c(20, NA, NA), 
        col = c(1, "slateblue", 1, 1))
+
+## ---- echo = FALSE, out.width = "75%"------------------------------------
+knitr::include_graphics("parallel_timings.jpg")
 
 ## ------------------------------------------------------------------------
 
@@ -90,18 +72,37 @@ MASS::truehist(orderNorm_obj$x.t, main = "orderNorm transformation", nbins = 12)
 
 ## ------------------------------------------------------------------------
 par(mfrow = c(1,2))
-MASS::truehist(BNobject$x.t, main = paste("Best Transformation:", BNobject$method), nbins = 12)
+MASS::truehist(BNobject$x.t, 
+               main = paste("Best Transformation:", 
+                            class(BNobject$chosen_transform)), nbins = 12)
 plot(xx, predict(BNobject, newdata = xx), type = "l", col = 1, 
      main = "Best Normalizing transformation", ylab = "g(x)", xlab = "x")
 
-## ---- fig.height=8, fig.width=7------------------------------------------
+## ------------------------------------------------------------------------
+boxplot(BNobject$resampled_norm_stats)
+
+## ------------------------------------------------------------------------
+bestNormalize(x, allow_orderNorm = FALSE, out_of_sample = FALSE)
+
+## ---- eval = FALSE-------------------------------------------------------
+#  library(parallel)
+#  cl <- makeCluster(4)
+#  bestNormalize(x, cluster = cl)
+#  stopCluster(cl)
+
+## ------------------------------------------------------------------------
 data("autotrader")
 autotrader$yearsold <- 2017 - autotrader$Year
 ### Using best-normalize
 (priceBN <- bestNormalize(autotrader$price))
-(mileageBN <- bestNormalize(autotrader$mileage))
-(yearsoldBN <- bestNormalize(autotrader$yearsold, allow_orderNorm = FALSE))
 
+## ------------------------------------------------------------------------
+(mileageBN <- bestNormalize(autotrader$mileage))
+
+## ------------------------------------------------------------------------
+(yearsoldBN <- bestNormalize(autotrader$yearsold))
+
+## ---- fig.height=8, fig.width=7------------------------------------------
 par(mfrow = c(3, 2))
 MASS::truehist(autotrader$price)
 MASS::truehist(priceBN$x.t)
