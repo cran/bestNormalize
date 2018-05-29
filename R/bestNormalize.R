@@ -9,6 +9,9 @@
 #'   
 #' @param x A vector to normalize
 #' @param allow_orderNorm set to FALSE if orderNorm should not be applied
+#' @param standardize If TRUE, the transformed values are also centered and
+#'   scaled, such that the transformation attempts a standard normal. This
+#'   will not change the normality statistic.
 #' @param out_of_sample if FALSE, estimates quickly in-sample performance
 #' @param cluster name of cluster set using \code{makeCluster}
 #' @param k number of folds
@@ -85,8 +88,9 @@
 #'  \code{\link{orderNorm}},
 #'  \code{\link{yeojohnson}} 
 #' @export
-bestNormalize <- function(x, allow_orderNorm = TRUE, out_of_sample = TRUE, 
-                          cluster = NULL, k = 10, r = 5) {
+bestNormalize <- function(x, standardize = TRUE, allow_orderNorm = TRUE,
+                          out_of_sample = TRUE, cluster = NULL, k = 10, 
+                          r = 5) {
   stopifnot(is.numeric(x))
   x.t <- list()
   methods <- c('lambert', 'yeojohnson', 'boxcox')
@@ -94,7 +98,7 @@ bestNormalize <- function(x, allow_orderNorm = TRUE, out_of_sample = TRUE,
     methods <- c(methods, 'orderNorm')
   
   for(i in methods) {
-    trans_i <- try(do.call(i, list(x = x)), silent = TRUE)
+    trans_i <- try(do.call(i, list(x = x, standardize = standardize)), silent = TRUE)
     if(is.character(trans_i))
       warning(paste(i, ' did not work; ', trans_i))
     else
@@ -127,7 +131,8 @@ bestNormalize <- function(x, allow_orderNorm = TRUE, out_of_sample = TRUE,
     method = method,
     resampled_norm_stats = reps,
     chosen_transform = x.t[[best_idx]],
-    other_transforms = x.t[names(x.t) != best_idx]
+    other_transforms = x.t[names(x.t) != best_idx],
+    standardize = standardize
   )
   class(val) <- 'bestNormalize'
   val
@@ -162,7 +167,6 @@ print.bestNormalize <- function(x, ...) {
   print(x$chosen_transform)
 }
 
-#' @importFrom parallel parLapplyLB clusterExport
 get_oos_estimates <- function(x, norm_methods, k, r, cluster) {
   x <- x[!is.na(x)]
   fold_size <- floor(length(x) / k)
@@ -193,9 +197,14 @@ get_oos_estimates <- function(x, norm_methods, k, r, cluster) {
     })
     reps <- Reduce(rbind, reps)
   } else {
+    # Check cluster args
+    if (!("cluster" %in% class(cluster))) 
+      stop("cluster is not of class 'cluster'; see ?makeCluster")
     
-    clusterExport(cl = cluster, c("k", "x", "norm_methods", norm_methods), envir = environment())
-    reps <- parLapplyLB(cl = cluster, 1:r, function(rep) {
+    # Add fns to library
+    parallel::clusterExport(cl = cluster, c("k", "x", "norm_methods", norm_methods), envir = environment())
+    parallel::clusterCall(cluster, function() library(bestNormalize))
+    reps <- parallel::parLapplyLB(cl = cluster, 1:r, function(rep) {
       
       resamples <- create_folds(x, k)
       pstats <- matrix(NA, ncol = length(norm_methods), nrow = k)

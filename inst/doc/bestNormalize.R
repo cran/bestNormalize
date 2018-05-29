@@ -2,7 +2,7 @@
 knitr::opts_chunk$set(echo = TRUE, fig.height = 5, fig.width = 7)
 library(bestNormalize)
 
-## ---- echo = FALSE, warning = FALSE--------------------------------------
+## ----orq_vis, echo = FALSE, warning = FALSE------------------------------
 
 x <- iris$Petal.Width
 on <- orderNorm(x)
@@ -25,17 +25,17 @@ legend('bottomright',
        pch = c(20, NA, NA), 
        col = c(1, "slateblue", 1, 1))
 
-## ---- echo = FALSE, out.width = "75%"------------------------------------
+## ----par_vis, echo = FALSE, out.width = "75%"----------------------------
 knitr::include_graphics("parallel_timings.jpg")
 
-## ------------------------------------------------------------------------
+## ----gen_data------------------------------------------------------------
 
 # Generate some data
 set.seed(100)
-x <- rgamma(1000, 1, 1)
+x <- rgamma(250, 1, 1)
 MASS::truehist(x, nbins = 12)
 
-## ------------------------------------------------------------------------
+## ----vis_code------------------------------------------------------------
 # Lambert's W x F transfromation
 (lambert_obj <- lambert(x))
 # Box Cox's Transformation
@@ -52,7 +52,7 @@ MASS::truehist(x, nbins = 12)
 (binarize_obj <- binarize(x))
 
 
-## ------------------------------------------------------------------------
+## ----vis_data------------------------------------------------------------
 xx <- seq(min(x), max(x), length = 100)
 plot(xx, predict(lambert_obj, newdata = xx), type = "l", col = 1, ylim = c(-4, 4),
      xlab = 'x', ylab = "g(x)")
@@ -63,14 +63,14 @@ lines(xx, predict(orderNorm_obj, newdata = xx), col = 4)
 legend("bottomright", legend = c("Lambert WxF", "Box Cox", "Yeo-Johnson", "OrderNorm"), 
        col = 1:4, lty = 1, bty = 'n')
 
-## ---- fig.height=8, fig.width = 7----------------------------------------
+## ----hist_trans, fig.height=8, fig.width = 7-----------------------------
 par(mfrow = c(2,2))
 MASS::truehist(lambert_obj$x.t, main = "Lambert WxF transformation", nbins = 12)
 MASS::truehist(boxcox_obj$x.t, main = "Box Cox transformation", nbins = 12)
 MASS::truehist(yeojohnson_obj$x.t, main = "Yeo-Johnson transformation", nbins = 12)
 MASS::truehist(orderNorm_obj$x.t, main = "orderNorm transformation", nbins = 12)
 
-## ------------------------------------------------------------------------
+## ----hist_best-----------------------------------------------------------
 par(mfrow = c(1,2))
 MASS::truehist(BNobject$x.t, 
                main = paste("Best Transformation:", 
@@ -78,31 +78,25 @@ MASS::truehist(BNobject$x.t,
 plot(xx, predict(BNobject, newdata = xx), type = "l", col = 1, 
      main = "Best Normalizing transformation", ylab = "g(x)", xlab = "x")
 
-## ------------------------------------------------------------------------
+## ----boxplot-------------------------------------------------------------
 boxplot(BNobject$resampled_norm_stats)
 
-## ------------------------------------------------------------------------
+## ----bn_output-----------------------------------------------------------
 bestNormalize(x, allow_orderNorm = FALSE, out_of_sample = FALSE)
 
-## ---- eval = FALSE-------------------------------------------------------
-#  library(parallel)
-#  cl <- makeCluster(4)
-#  bestNormalize(x, cluster = cl)
-#  stopCluster(cl)
-
-## ------------------------------------------------------------------------
+## ----load_appdata--------------------------------------------------------
 data("autotrader")
 autotrader$yearsold <- 2017 - autotrader$Year
 ### Using best-normalize
 (priceBN <- bestNormalize(autotrader$price))
 
-## ------------------------------------------------------------------------
+## ----bn_mileage----------------------------------------------------------
 (mileageBN <- bestNormalize(autotrader$mileage))
 
-## ------------------------------------------------------------------------
+## ----bn_yearsold---------------------------------------------------------
 (yearsoldBN <- bestNormalize(autotrader$yearsold))
 
-## ---- fig.height=8, fig.width=7------------------------------------------
+## ----hist_app, fig.height=8, fig.width=7---------------------------------
 par(mfrow = c(3, 2))
 MASS::truehist(autotrader$price)
 MASS::truehist(priceBN$x.t)
@@ -111,7 +105,7 @@ MASS::truehist(mileageBN$x.t)
 MASS::truehist(autotrader$yearsold)
 MASS::truehist(yearsoldBN$x.t)
 
-## ------------------------------------------------------------------------
+## ----hist_app2-----------------------------------------------------------
 par(mfrow = c(2, 2))
 price.xx <- seq(min(autotrader$price), max(autotrader$price), length = 100)
 mileage.xx <- seq(min(autotrader$mileage), max(autotrader$mileage), length = 100)
@@ -127,7 +121,7 @@ plot(yearsold.xx, predict(yearsoldBN, newdata = yearsold.xx), type = "l",
      main = "Years-old bestNormalizing transformation", 
      xlab = "Years-old", ylab = "g(Years-old)")
 
-## ------------------------------------------------------------------------
+## ----app_vis-------------------------------------------------------------
 autotrader$price.t <- priceBN$x.t
 autotrader$mileage.t <- mileageBN$x.t
 autotrader$yearsold.t <- yearsoldBN$x.t

@@ -7,8 +7,8 @@ train <- iris$Petal.Width
 lambert_obj <- lambert(train)
 
 test_that('lambert Transforms original data consistently' , {
-  expect_equal(lambert_obj$x.t, predict.lambert(lambert_obj))
-  expect_equal(lambert_obj$x, predict.lambert(lambert_obj, inverse = T))
+  expect_equal(lambert_obj$x.t, predict(lambert_obj))
+  expect_equal(lambert_obj$x, predict(lambert_obj, inverse = T))
 })
 
 test_that('lambert Transforms new data consistently', {
@@ -20,14 +20,31 @@ test_that('lambert Transforms new data consistently', {
   expect_equal(nd, nd2)
 })
 
+lambert_obj <- lambert(train, standardize = FALSE)
+
+test_that('lambert without standardization Transforms original data consistently' , {
+  expect_equal(lambert_obj$x.t, predict(lambert_obj))
+  expect_equal(lambert_obj$x, predict(lambert_obj, inverse = T))
+})
+
+test_that('lambert without standardization Transforms new data consistently', {
+  nd <- seq(-1, 4, length = 100)
+  pred <- predict(lambert_obj, newdata = nd)
+  expect_true(!any(is.na(pred)))
+  
+  nd2 <- predict(lambert_obj, newdata = pred, inverse = TRUE)
+  expect_equal(nd, nd2)
+})
+
+
 # For type = 'hh'
 
 lambert_obj <- lambert(train, type = 'hh')
 
 test_that('lambert Transforms original data consistently' , {
-  expect_equal(lambert_obj$x.t, predict.lambert(lambert_obj))
+  expect_equal(lambert_obj$x.t, predict(lambert_obj))
   expect_equal(lambert_obj$x, 
-               predict.lambert(lambert_obj, inverse = T), 
+               predict(lambert_obj, inverse = T), 
                tolerance = .001)
 })
 
@@ -46,8 +63,8 @@ test_that('lambert Transforms new data consistently', {
 lambert_obj <- lambert(train, type = 'h')
 
 test_that('lambert Transforms original data consistently' , {
-  expect_equal(lambert_obj$x.t, predict.lambert(lambert_obj))
-  expect_equal(lambert_obj$x, predict.lambert(lambert_obj, inverse = T))
+  expect_equal(lambert_obj$x.t, predict(lambert_obj))
+  expect_equal(lambert_obj$x, predict(lambert_obj, inverse = T))
 })
 
 test_that('lambert Transforms new data consistently', {
