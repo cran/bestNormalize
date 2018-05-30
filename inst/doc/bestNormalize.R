@@ -36,8 +36,10 @@ x <- rgamma(250, 1, 1)
 MASS::truehist(x, nbins = 12)
 
 ## ----vis_code------------------------------------------------------------
-# Lambert's W x F transfromation
-(lambert_obj <- lambert(x))
+# Perform some tranformations individually
+
+# arcsinh transformation
+(arcsinh_obj <- arcsinh_x(x))
 # Box Cox's Transformation
 (boxcox_obj <- boxcox(x))
 # Yeo-Johnson's Transformation
@@ -54,18 +56,18 @@ MASS::truehist(x, nbins = 12)
 
 ## ----vis_data------------------------------------------------------------
 xx <- seq(min(x), max(x), length = 100)
-plot(xx, predict(lambert_obj, newdata = xx), type = "l", col = 1, ylim = c(-4, 4),
+plot(xx, predict(arcsinh_obj, newdata = xx), type = "l", col = 1, ylim = c(-4, 4),
      xlab = 'x', ylab = "g(x)")
 lines(xx, predict(boxcox_obj, newdata = xx), col = 2)
 lines(xx, predict(yeojohnson_obj, newdata = xx), col = 3)
 lines(xx, predict(orderNorm_obj, newdata = xx), col = 4)
 
-legend("bottomright", legend = c("Lambert WxF", "Box Cox", "Yeo-Johnson", "OrderNorm"), 
+legend("bottomright", legend = c("arcsinh", "Box Cox", "Yeo-Johnson", "OrderNorm"), 
        col = 1:4, lty = 1, bty = 'n')
 
 ## ----hist_trans, fig.height=8, fig.width = 7-----------------------------
 par(mfrow = c(2,2))
-MASS::truehist(lambert_obj$x.t, main = "Lambert WxF transformation", nbins = 12)
+MASS::truehist(arcsinh_obj$x.t, main = "Arcsinh transformation", nbins = 12)
 MASS::truehist(boxcox_obj$x.t, main = "Box Cox transformation", nbins = 12)
 MASS::truehist(yeojohnson_obj$x.t, main = "Yeo-Johnson transformation", nbins = 12)
 MASS::truehist(orderNorm_obj$x.t, main = "orderNorm transformation", nbins = 12)
@@ -74,27 +76,28 @@ MASS::truehist(orderNorm_obj$x.t, main = "orderNorm transformation", nbins = 12)
 par(mfrow = c(1,2))
 MASS::truehist(BNobject$x.t, 
                main = paste("Best Transformation:", 
-                            class(BNobject$chosen_transform)), nbins = 12)
+                            class(BNobject$chosen_transform)[1]), nbins = 12)
 plot(xx, predict(BNobject, newdata = xx), type = "l", col = 1, 
      main = "Best Normalizing transformation", ylab = "g(x)", xlab = "x")
 
-## ----boxplot-------------------------------------------------------------
-boxplot(BNobject$resampled_norm_stats)
+## ----boxplot, fig.width=7------------------------------------------------
+boxplot(log10(BNobject$resampled_norm_stats), yaxt = 'n')
+axis(2, at=log10(c(.1,.5, 1, 2, 5, 10)), labels=c(.1,.5, 1, 2, 5, 10))
 
 ## ----bn_output-----------------------------------------------------------
 bestNormalize(x, allow_orderNorm = FALSE, out_of_sample = FALSE)
 
-## ----load_appdata--------------------------------------------------------
+## ----load_appdata, warning=FALSE-----------------------------------------
 data("autotrader")
 autotrader$yearsold <- 2017 - autotrader$Year
 ### Using best-normalize
-(priceBN <- bestNormalize(autotrader$price))
+(priceBN <- bestNormalize(autotrader$price, r = 1, k = 5))
 
-## ----bn_mileage----------------------------------------------------------
-(mileageBN <- bestNormalize(autotrader$mileage))
+## ----bn_mileage, warning=FALSE-------------------------------------------
+(mileageBN <- bestNormalize(autotrader$mileage, r = 1, k = 5))
 
-## ----bn_yearsold---------------------------------------------------------
-(yearsoldBN <- bestNormalize(autotrader$yearsold))
+## ----bn_yearsold, warning=FALSE------------------------------------------
+(yearsoldBN <- bestNormalize(autotrader$yearsold, r = 1, k = 5))
 
 ## ----hist_app, fig.height=8, fig.width=7---------------------------------
 par(mfrow = c(3, 2))
