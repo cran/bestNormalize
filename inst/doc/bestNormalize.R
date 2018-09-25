@@ -2,13 +2,13 @@
 knitr::opts_chunk$set(echo = TRUE, fig.height = 5, fig.width = 7)
 library(bestNormalize)
 
-## ----orq_vis, echo = FALSE, warning = FALSE------------------------------
+## ----orq_vis, echo = FALSE-----------------------------------------------
 
 x <- iris$Petal.Width
-on <- orderNorm(x)
+on <- orderNorm(x, warn = FALSE)
 xx <- seq(min(x) - 1, max(x) + 1, length = 1000)
-yy <- predict(on, xx)
-r <- (rank(x) / (length(x) + 1))
+yy <- suppressWarnings(predict(on, xx))
+r <- ((rank(x) + .5) / (length(x) + 1))
 f  <- suppressWarnings(glm(r ~ x, family = "binomial"))
 p <- qnorm(predict(f, newdata = data.frame(x = xx), type = 'response'))
 
@@ -80,24 +80,24 @@ MASS::truehist(BNobject$x.t,
 plot(xx, predict(BNobject, newdata = xx), type = "l", col = 1, 
      main = "Best Normalizing transformation", ylab = "g(x)", xlab = "x")
 
-## ----boxplot, fig.width=7------------------------------------------------
-boxplot(log10(BNobject$resampled_norm_stats), yaxt = 'n')
+## ----boxplot, fig.width=10, out.width="100%"-----------------------------
+boxplot(log10(BNobject$oos_preds), yaxt = 'n')
 axis(2, at=log10(c(.1,.5, 1, 2, 5, 10)), labels=c(.1,.5, 1, 2, 5, 10))
 
 ## ----bn_output-----------------------------------------------------------
 bestNormalize(x, allow_orderNorm = FALSE, out_of_sample = FALSE)
 
-## ----load_appdata, warning=FALSE-----------------------------------------
+## ----load_appdata--------------------------------------------------------
 data("autotrader")
 autotrader$yearsold <- 2017 - autotrader$Year
 ### Using best-normalize
-(priceBN <- bestNormalize(autotrader$price, r = 1, k = 5))
+(priceBN <- bestNormalize(autotrader$price, r = 1, k = 5, warn = F))
 
-## ----bn_mileage, warning=FALSE-------------------------------------------
-(mileageBN <- bestNormalize(autotrader$mileage, r = 1, k = 5))
+## ----bn_mileage----------------------------------------------------------
+(mileageBN <- bestNormalize(autotrader$mileage, r = 1, k = 5, warn = F))
 
-## ----bn_yearsold, warning=FALSE------------------------------------------
-(yearsoldBN <- bestNormalize(autotrader$yearsold, r = 1, k = 5))
+## ----bn_yearsold---------------------------------------------------------
+(yearsoldBN <- bestNormalize(autotrader$yearsold, r = 1, k = 5, warn = F))
 
 ## ----hist_app, fig.height=8, fig.width=7---------------------------------
 par(mfrow = c(3, 2))

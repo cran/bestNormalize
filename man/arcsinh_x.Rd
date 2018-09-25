@@ -3,13 +3,13 @@
 \name{arcsinh_x}
 \alias{arcsinh_x}
 \alias{predict.arcsinh_x}
-\alias{predict.arcsinh_x}
 \alias{print.arcsinh_x}
 \title{arcsinh(x) Transformation}
 \usage{
 arcsinh_x(x, standardize = TRUE)
 
-\method{predict}{arcsinh_x}(object, newdata = NULL, inverse = FALSE, ...)
+\method{predict}{arcsinh_x}(object, newdata = NULL, inverse = FALSE,
+  ...)
 
 \method{print}{arcsinh_x}(x, ...)
 }
@@ -32,8 +32,8 @@ A list of class \code{arcsinh_x} with elements
 \item{x.t}{transformed 
   original data} 
   \item{x}{original data} 
-  \item{mean}{mean of vector post-transformation} 
-  \item{sd}{sd of vector post-transformation} 
+  \item{mean}{mean after transformation but prior to standardization} 
+  \item{sd}{sd after transformation but prior to standardization} 
   \item{n}{number of nonmissing observations}
   \item{norm_stat}{Pearson's P / degrees of freedom}
   \item{standardize}{was the transformation standardized}

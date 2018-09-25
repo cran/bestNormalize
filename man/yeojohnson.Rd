@@ -3,13 +3,13 @@
 \name{yeojohnson}
 \alias{yeojohnson}
 \alias{predict.yeojohnson}
-\alias{predict.yeojohnson}
 \alias{print.yeojohnson}
 \title{Yeo-Johnson Normalization}
 \usage{
 yeojohnson(x, eps = 0.001, standardize = TRUE, ...)
 
-\method{predict}{yeojohnson}(object, newdata = NULL, inverse = FALSE, ...)
+\method{predict}{yeojohnson}(object, newdata = NULL, inverse = FALSE,
+  ...)
 
 \method{print}{yeojohnson}(x, ...)
 }
@@ -31,12 +31,16 @@ lambda parameter (lower, upper)}
 \item{inverse}{if TRUE, performs reverse transformation}
 }
 \value{
-A list of class \code{yeojohnson} with elements \item{x.t}{transformed
- original data} \item{x}{original data} \item{mean}{mean of vector post-YJ
- transformation} \item{sd}{sd of vector post-BC transformation}
- \item{lambda}{estimated lambda value for skew transformation}
- \item{n}{number of nonmissing observations} \item{norm_stat}{Pearson's P /
- degrees of freedom} \item{standardize}{Was the transformation standardized}
+A list of class \code{yeojohnson} with elements
+
+  \item{x.t}{transformed original data} 
+  \item{x}{original data}
+  \item{mean}{mean after transformation but prior to standardization} 
+  \item{sd}{sd after transformation but prior to standardization} 
+  \item{lambda}{estimated lambda value for skew transformation}
+  \item{n}{number of nonmissing observations} 
+  \item{norm_stat}{Pearson's P / degrees of freedom} 
+  \item{standardize}{Was the transformation standardized}
 
  The \code{predict} function returns the numeric value of the transformation
  performed on new data, and allows for the inverse transformation as well.

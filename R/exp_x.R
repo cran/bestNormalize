@@ -20,8 +20,8 @@
 #' \item{x.t}{transformed 
 #'   original data} 
 #'   \item{x}{original data} 
-#'   \item{mean}{mean of vector post-transformation} 
-#'   \item{sd}{sd of vector post-transformation} 
+#'   \item{mean}{mean after transformation but prior to standardization} 
+#'   \item{sd}{sd after transformation but prior to standardization} 
 #'   \item{n}{number of nonmissing observations}
 #'   \item{norm_stat}{Pearson's P / degrees of freedom}
 #'   \item{standardize}{was the transformation standardized}
@@ -45,17 +45,20 @@ exp_x <- function(x, standardize = TRUE, warn = TRUE) {
   stopifnot(is.numeric(x))
   
   x.t <- exp(x)
-  
-  stopifnot(!all(infinite_idx <- is.infinite(x.t)))
-  if(any(infinite_idx)) {
-    warning("Some values are infinite")
-    standardize <- FALSE
-  }
-  
   mu <- mean(x.t, na.rm = TRUE)
   sigma <- sd(x.t, na.rm = TRUE)
   if (standardize) x.t <- (x.t - mu) / sigma
+  infinite_idx <- is.infinite(x.t)
   
+  if(sum(is.finite(x.t)) < 5) {
+    stop("Transformation finite for less than 3 x values")
+  }
+  if(any(infinite_idx) & warn) {
+    warning("Some values (but not all) transformed values are infinite")
+    standardize <- FALSE
+  }
+  
+
   ptest <- nortest::pearson.test(x.t)
   
   val <- list(
@@ -99,8 +102,8 @@ print.exp_x <- function(x, ...) {
   cat(ifelse(x$standardize, "Standardized", "Non-Standardized"),
       'exp(x) Transformation with', x$n, 'nonmissing obs.:\n', 
       'Relevant statistics:\n',
-      '- mean (post-transform) =', x$mean, '\n',
-      '- sd (post-transform) =', x$sd, '\n')
+      '- mean (before standardization) =', x$mean, '\n',
+      '- sd (before standardization) =', x$sd, '\n')
 }
 
 
