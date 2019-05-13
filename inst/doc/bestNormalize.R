@@ -8,7 +8,7 @@ x <- iris$Petal.Width
 on <- orderNorm(x, warn = FALSE)
 xx <- seq(min(x) - 1, max(x) + 1, length = 1000)
 yy <- suppressWarnings(predict(on, xx))
-r <- ((rank(x) + .5) / (length(x) + 1))
+r <- ((rank(x) - .5) / (length(x) + 1))
 f  <- suppressWarnings(glm(r ~ x, family = "binomial"))
 p <- qnorm(predict(f, newdata = data.frame(x = xx), type = 'response'))
 
