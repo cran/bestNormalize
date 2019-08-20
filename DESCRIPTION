@@ -1,10 +1,10 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.4.0
-Date: 2019-05-13
+Version: 1.4.2
+Date: 2019-08-20
 Authors@R: person("Ryan Andrew", "Peterson", 
-                  email = "ryan-peterson@uiowa.edu", 
+                  email = "ryan.a.peterson@cuanschutz.edu", 
                   role = c("aut", "cre"))
 Description: Estimate a suite of normalizing transformations, including 
     a new adaptation of a technique based on ranks which can guarantee 
@@ -29,8 +29,8 @@ LazyData: true
 RoxygenNote: 6.1.1
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2019-05-13 18:11:16 UTC; rpterson
+Packaged: 2019-08-20 19:31:10 UTC; ryanpeterson
 Author: Ryan Andrew Peterson [aut, cre]
-Maintainer: Ryan Andrew Peterson <ryan-peterson@uiowa.edu>
+Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
 Repository: CRAN
-Date/Publication: 2019-05-13 19:00:04 UTC
+Date/Publication: 2019-08-20 21:20:13 UTC
