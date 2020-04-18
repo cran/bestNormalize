@@ -1,3 +1,9 @@
+# bestNormalize 1.5.0
+
+- Added `step_bestNormalize` and `step_orderNorm` functions for implementation within `recipes`. 
+- Changed default to `warn = FALSE` when calling `bestNormalize`. If a transformation doesn't work, 
+  warnings will *no longer* be shown by default unless `warn` is set to `TRUE`.
+
 # bestNormalize 1.4.3
 
 - Allow options to be passed through bestNormalize to specific transformation functions 

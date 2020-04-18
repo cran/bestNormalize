@@ -1,8 +1,8 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.4.3
-Date: 2020-01-27
+Version: 1.5.0
+Date: 2020-04-17
 Authors@R: person("Ryan Andrew", "Peterson", 
                   email = "ryan.a.peterson@cuanschutz.edu", 
                   role = c("aut", "cre"))
@@ -22,15 +22,16 @@ Description: Estimate a suite of normalizing transformations, including
 URL: https://github.com/petersonR/bestNormalize
 License: GPL-3
 Depends: R (>= 3.1.0)
-Imports: LambertW, nortest, dplyr, doParallel, foreach, doRNG
+Imports: LambertW, nortest, dplyr, doParallel, foreach, doRNG, recipes,
+        tibble
 Suggests: knitr, rmarkdown, MASS, testthat, mgcv, parallel
 VignetteBuilder: knitr
 LazyData: true
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2020-01-27 16:13:02 UTC; ryanpeterson
+Packaged: 2020-04-17 22:28:22 UTC; rpterson
 Author: Ryan Andrew Peterson [aut, cre]
 Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
 Repository: CRAN
-Date/Publication: 2020-01-27 17:00:02 UTC
+Date/Publication: 2020-04-18 04:20:02 UTC

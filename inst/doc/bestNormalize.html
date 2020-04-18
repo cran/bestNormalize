@@ -1,19 +1,18 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <meta name="author" content="Ryan A Peterson" />
 
-<meta name="date" content="2020-01-27" />
+<meta name="date" content="2020-04-17" />
 
 <title>Using the bestNormalize Package</title>
 
@@ -118,9 +117,6 @@ padding-right: 2em;
 font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 font-size: 14px;
 line-height: 1.35;
-}
-#header {
-text-align: center;
 }
 #TOC {
 clear: both;
@@ -289,7 +285,8 @@ code > span.st { color: #d14; }
 code > span.co { color: #888888; font-style: italic; } 
 code > span.ot { color: #007020; } 
 code > span.al { color: #ff0000; font-weight: bold; } 
-code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
 </style>
 
 
@@ -304,7 +301,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 <h1 class="title toc-ignore">Using the bestNormalize Package</h1>
 <h4 class="author">Ryan A Peterson</h4>
-<h4 class="date">2020-01-27</h4>
+<h4 class="date">2020-04-17</h4>
 
 
 
@@ -530,7 +527,7 @@ g(x) = \Phi ^{-1} \left(\frac{\text{rank} (x) - 1/2}{\text{length}(x) }\right)
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb20-1" data-line-number="1"><span class="kw">data</span>(<span class="st">&quot;autotrader&quot;</span>)</a>
 <a class="sourceLine" id="cb20-2" data-line-number="2">autotrader<span class="op">$</span>yearsold &lt;-<span class="st"> </span><span class="dv">2017</span> <span class="op">-</span><span class="st"> </span>autotrader<span class="op">$</span>Year</a>
 <a class="sourceLine" id="cb20-3" data-line-number="3"><span class="co">### Using best-normalize</span></a>
-<a class="sourceLine" id="cb20-4" data-line-number="4">(priceBN &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(autotrader<span class="op">$</span>price, <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">k =</span> <span class="dv">5</span>, <span class="dt">warn =</span> F))</a></code></pre></div>
+<a class="sourceLine" id="cb20-4" data-line-number="4">(priceBN &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(autotrader<span class="op">$</span>price, <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">k =</span> <span class="dv">5</span>))</a></code></pre></div>
 <pre><code>## Best Normalizing transformation with 6283 Observations
 ##  Estimated Normality Statistics (Pearson P / df, lower =&gt; more normal):
 ##  - No transform: 6.5445 
@@ -549,7 +546,7 @@ g(x) = \Phi ^{-1} \left(\frac{\text{rank} (x) - 1/2}{\text{length}(x) }\right)
 ##    0%   25%   50%   75%  100% 
 ##   722 11499 15998 21497 64998</code></pre>
 <p>Note that <code>orderNorm</code> throws a warning due to the ties in the price vector. We can see that the estimated normality statistic for the OrderNorm transformation is close to one, however, so we know it is performing quite well. It is also performing better than all of the other transformations.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">(mileageBN &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(autotrader<span class="op">$</span>mileage, <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">k =</span> <span class="dv">5</span>, <span class="dt">warn =</span> F))</a></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb22-1" data-line-number="1">(mileageBN &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(autotrader<span class="op">$</span>mileage, <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">k =</span> <span class="dv">5</span>))</a></code></pre></div>
 <pre><code>## Best Normalizing transformation with 6283 Observations
 ##  Estimated Normality Statistics (Pearson P / df, lower =&gt; more normal):
 ##  - No transform: 21.8352 
@@ -568,7 +565,7 @@ g(x) = \Phi ^{-1} \left(\frac{\text{rank} (x) - 1/2}{\text{length}(x) }\right)
 ##     0%    25%    50%    75%   100% 
 ##      2  29099  44800  88950 325556</code></pre>
 <p>Similarly, the ORQ normalization performed best for mileage, and the ties didn’t seem to be too big of a deal.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">(yearsoldBN &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(autotrader<span class="op">$</span>yearsold, <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">k =</span> <span class="dv">5</span>, <span class="dt">warn =</span> F))</a></code></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb24-1" data-line-number="1">(yearsoldBN &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(autotrader<span class="op">$</span>yearsold, <span class="dt">r =</span> <span class="dv">1</span>, <span class="dt">k =</span> <span class="dv">5</span>))</a></code></pre></div>
 <pre><code>## Best Normalizing transformation with 6283 Observations
 ##  Estimated Normality Statistics (Pearson P / df, lower =&gt; more normal):
 ##  - No transform: 171.8882 
