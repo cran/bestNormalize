@@ -1,8 +1,8 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.5.0
-Date: 2020-04-17
+Version: 1.6.0
+Date: 2020-05-20
 Authors@R: person("Ryan Andrew", "Peterson", 
                   email = "ryan.a.peterson@cuanschutz.edu", 
                   role = c("aut", "cre"))
@@ -18,20 +18,21 @@ Description: Estimate a suite of normalizing transformations, including
     the Box-Cox transformation, the Yeo-Johnson transformation, three types 
     of Lambert WxF transformations, and the ordered quantile normalization 
     transformation. It also estimates the normalization efficacy of other
-    commonly used transformations. 
+    commonly used transformations, and finally it allows users to specify 
+    custom transformations or normalization statistics.
 URL: https://github.com/petersonR/bestNormalize
 License: GPL-3
 Depends: R (>= 3.1.0)
 Imports: LambertW, nortest, dplyr, doParallel, foreach, doRNG, recipes,
-        tibble
+        tibble, methods
 Suggests: knitr, rmarkdown, MASS, testthat, mgcv, parallel
 VignetteBuilder: knitr
 LazyData: true
 RoxygenNote: 7.1.0
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2020-04-17 22:28:22 UTC; rpterson
+Packaged: 2020-05-20 21:21:11 UTC; ryanpeterson
 Author: Ryan Andrew Peterson [aut, cre]
 Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
 Repository: CRAN
-Date/Publication: 2020-04-18 04:20:02 UTC
+Date/Publication: 2020-05-20 21:40:02 UTC

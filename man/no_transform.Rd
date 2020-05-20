@@ -6,7 +6,7 @@
 \alias{print.no_transform}
 \title{Identity transformation}
 \usage{
-no_transform(x, standardize = FALSE, warn = TRUE)
+no_transform(x, warn = TRUE, ...)
 
 \method{predict}{no_transform}(object, newdata = NULL, inverse = FALSE, ...)
 
@@ -15,28 +15,22 @@ no_transform(x, standardize = FALSE, warn = TRUE)
 \arguments{
 \item{x}{A vector}
 
-\item{standardize}{If TRUE, the transformed values are centered and
-scaled}
-
 \item{warn}{Should a warning result from infinite values?}
+
+\item{...}{additional arguments}
 
 \item{object}{an object of class 'no_transform'}
 
 \item{newdata}{a vector of data to be (potentially reverse) transformed}
 
 \item{inverse}{if TRUE, performs reverse transformation}
-
-\item{...}{additional arguments}
 }
 \value{
 A list of class \code{no_transform} with elements
   \item{x.t}{transformed original data} 
   \item{x}{original data}
-  \item{mean}{mean after transformation but prior to standardization} 
-  \item{sd}{sd after transformation but prior to standardization} 
   \item{n}{number of nonmissing observations}
   \item{norm_stat}{Pearson's P / degrees of freedom} 
-  \item{standardize}{was the transformation standardized}
 
   The \code{predict} function returns the numeric value of the transformation
   performed on new data, and allows for the inverse transformation as well.

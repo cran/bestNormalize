@@ -1,3 +1,10 @@
+# bestNormalize 1.6.0
+
+- Added ability to supply user-defined transformations and associated vignette
+- Added in ability to supply user-defined normalization statistics and (the same) associated vignette
+- Take out `standardize` option from `no_transform` so `x.t` always matches input vector.
+- Minor programming improvements
+
 # bestNormalize 1.5.0
 
 - Added `step_bestNormalize` and `step_orderNorm` functions for implementation within `recipes`. 
