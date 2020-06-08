@@ -1,3 +1,8 @@
+# bestNormalize 1.6.1
+
+- Fixed bug that was causing simple transforms to fail in `bestNormalize`
+- Updated to new LambertW version in dependencies (request from CRAN)
+
 # bestNormalize 1.6.0
 
 - Added ability to supply user-defined transformations and associated vignette

@@ -4,7 +4,7 @@ library(bestNormalize)
 
 ## -----------------------------------------------------------------------------
 ## Define user-function
-cuberoot_x <- function(x, a = NULL, standardize = TRUE) {
+cuberoot_x <- function(x, a = NULL, standardize = TRUE, ...) {
   stopifnot(is.numeric(x))
   
   min_a <- max(0, -(min(x, na.rm = TRUE)))
@@ -94,7 +94,7 @@ print.cuberoot_x <- function(x, ...) {
 
 
 ## -----------------------------------------------------------------------------
-
+# Store custom functions into list
 custom_transform <- list(
   cuberoot_x = cuberoot_x,
   predict.cuberoot_x = predict.cuberoot_x,
@@ -103,7 +103,7 @@ custom_transform <- list(
 
 set.seed(123129)
 x <- rgamma(100, 1, 1)
-(b <- bestNormalize(x = x, new_transforms = custom_transform, standardize = FALSE))
+(b <- bestNormalize(x = x, new_transforms = custom_transform))
 
 ## -----------------------------------------------------------------------------
 all.equal(x^(1/3), b$chosen_transform$x.t)
@@ -116,8 +116,8 @@ bestNormalize(x, norm_stat_fn = function(x) nortest::lillie.test(x)$stat)
 (dont_do_this <- bestNormalize(x, norm_stat_fn = function(x) nortest::lillie.test(x)$p))
 
 ## -----------------------------------------------------------------------------
-best_tranform <- names(which.max(dont_do_this$norm_stats))
-(do_this <- dont_do_this$other_transforms[[best_tranform]])
+best_transform <- names(which.max(dont_do_this$norm_stats))
+(do_this <- dont_do_this$other_transforms[[best_transform]])
 
 ## -----------------------------------------------------------------------------
 (do_this <- bestNormalize(x, norm_stat_fn = function(x) 1-nortest::lillie.test(x)$p))

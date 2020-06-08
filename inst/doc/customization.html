@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ryan A Peterson" />
 
-<meta name="date" content="2020-05-20" />
+<meta name="date" content="2020-06-08" />
 
 <title>Customization within bestNormalize</title>
 
@@ -301,14 +301,26 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Customization within bestNormalize</h1>
 <h4 class="author">Ryan A Peterson</h4>
-<h4 class="date">2020-05-20</h4>
+<h4 class="date">2020-06-08</h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#custom-functions-with-bestnormalize">Custom functions with bestNormalize</a><ul>
+<li><a href="#example-cube-root">Example: cube-root</a></li>
+<li><a href="#s3-methods">S3 methods</a></li>
+<li><a href="#optional-print-method">Optional: print method</a></li>
+<li><a href="#implementing-with-bestnormalize">Implementing with bestNormalize</a></li>
+<li><a href="#sanity-check">Sanity check</a></li>
+</ul></li>
+<li><a href="#using-custom-normalization-statistics">Using custom normalization statistics</a></li>
+</ul>
+</div>
 
 <div id="custom-functions-with-bestnormalize" class="section level1">
 <h1>Custom functions with bestNormalize</h1>
 <p>This vignette will go over the steps required to implement a custom user-defined function within the <code>bestNormalize</code> framework.</p>
-<p>There are only 2 steps.</p>
+<p>There are 3 steps.</p>
 <ol style="list-style-type: decimal">
 <li><p>Create transformation function</p></li>
 <li><p>Create predict method for transformation function (that can be applied to new data)</p></li>
@@ -319,9 +331,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="s3-methods" class="section level2">
 <h2>S3 methods</h2>
-<p>Here, we start by defining a new function that we’ll call <code>cuberoot_x</code>.</p>
+<p>Here, we start by defining a new function that we’ll call <code>cuberoot_x</code>, which will take an argument <code>a</code> (as does the <code>sqrt_x</code> function) which will try to add a constant if it sees any negative numbers in <code>x</code>. It will also take the argument <code>standardize</code> which will center and scale the transformed data so that it’s centered at 0 with SD = 1.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="co">## Define user-function</span></a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">cuberoot_x &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">a =</span> <span class="ot">NULL</span>, <span class="dt">standardize =</span> <span class="ot">TRUE</span>) {</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">cuberoot_x &lt;-<span class="st"> </span><span class="cf">function</span>(x, <span class="dt">a =</span> <span class="ot">NULL</span>, <span class="dt">standardize =</span> <span class="ot">TRUE</span>, ...) {</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3">  <span class="kw">stopifnot</span>(<span class="kw">is.numeric</span>(x))</a>
 <a class="sourceLine" id="cb1-4" data-line-number="4">  </a>
 <a class="sourceLine" id="cb1-5" data-line-number="5">  min_a &lt;-<span class="st"> </span><span class="kw">max</span>(<span class="dv">0</span>, <span class="op">-</span>(<span class="kw">min</span>(x, <span class="dt">na.rm =</span> <span class="ot">TRUE</span>)))</a>
@@ -357,7 +369,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb1-35" data-line-number="35">  <span class="kw">class</span>(val) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">'cuberoot_x'</span>, <span class="kw">class</span>(val))</a>
 <a class="sourceLine" id="cb1-36" data-line-number="36">  val</a>
 <a class="sourceLine" id="cb1-37" data-line-number="37">}</a></code></pre></div>
-<p>Note that we assigned a class to the object this returns of the same name; this is necessary. We’ll also need an associated “predict” method that is used to apply the transformation to newly observed data.</p>
+<p>Note that we assigned a class to the object this returns of the same name; this is necessary for successful implementation within <code>bestNormalize</code>. We’ll also need an associated <code>predict</code> method that is used to apply the transformation to newly observed data. `</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">predict.cuberoot_x &lt;-<span class="st"> </span><span class="cf">function</span>(object, <span class="dt">newdata =</span> <span class="ot">NULL</span>, <span class="dt">inverse =</span> <span class="ot">FALSE</span>, ...) {</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2">  </a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">  <span class="co"># If no data supplied and not inverse</span></a>
@@ -408,17 +420,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <a class="sourceLine" id="cb3-8" data-line-number="8">}</a></code></pre></div>
 <p>Note: if you can find a similar transformation in the source code, it’s easy to model your code after it. For instance, for <code>cuberoot_x</code> and <code>predict.cuberoot_x</code>, I used <code>sqrt_x.R</code> as a template file.</p>
 </div>
-<div id="implementing-witih-bestnormalize" class="section level2">
-<h2>Implementing witih bestNormalize</h2>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">custom_transform &lt;-<span class="st"> </span><span class="kw">list</span>(</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2">  <span class="dt">cuberoot_x =</span> cuberoot_x,</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">predict.cuberoot_x =</span> predict.cuberoot_x,</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="dt">print.cuberoot_x =</span> print.cuberoot_x</a>
-<a class="sourceLine" id="cb4-5" data-line-number="5">)</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="kw">set.seed</span>(<span class="dv">123129</span>)</a>
-<a class="sourceLine" id="cb4-8" data-line-number="8">x &lt;-<span class="st"> </span><span class="kw">rgamma</span>(<span class="dv">100</span>, <span class="dv">1</span>, <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb4-9" data-line-number="9">(b &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(<span class="dt">x =</span> x, <span class="dt">new_transforms =</span> custom_transform, <span class="dt">standardize =</span> <span class="ot">FALSE</span>))</a></code></pre></div>
+<div id="implementing-with-bestnormalize" class="section level2">
+<h2>Implementing with bestNormalize</h2>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># Store custom functions into list</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2">custom_transform &lt;-<span class="st"> </span><span class="kw">list</span>(</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">  <span class="dt">cuberoot_x =</span> cuberoot_x,</a>
+<a class="sourceLine" id="cb4-4" data-line-number="4">  <span class="dt">predict.cuberoot_x =</span> predict.cuberoot_x,</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5">  <span class="dt">print.cuberoot_x =</span> print.cuberoot_x</a>
+<a class="sourceLine" id="cb4-6" data-line-number="6">)</a>
+<a class="sourceLine" id="cb4-7" data-line-number="7"></a>
+<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="kw">set.seed</span>(<span class="dv">123129</span>)</a>
+<a class="sourceLine" id="cb4-9" data-line-number="9">x &lt;-<span class="st"> </span><span class="kw">rgamma</span>(<span class="dv">100</span>, <span class="dv">1</span>, <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb4-10" data-line-number="10">(b &lt;-<span class="st"> </span><span class="kw">bestNormalize</span>(<span class="dt">x =</span> x, <span class="dt">new_transforms =</span> custom_transform))</a></code></pre></div>
 <pre><code>## Best Normalizing transformation with 100 Observations
 ##  Estimated Normality Statistics (Pearson P / df, lower =&gt; more normal):
 ##  - arcsinh(x): 1.2347
@@ -433,7 +446,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ## Estimation method: Out-of-sample via CV with 10 folds and 5 repeats
 ##  
 ## Based off these, bestNormalize chose:
-## Non-Standardized cuberoot(x + a) Transformation with 100 nonmissing obs.:
+## Standardized cuberoot(x + a) Transformation with 100 nonmissing obs.:
 ##  Relevant statistics:
 ##  - a = 0 
 ##  - mean (before standardization) = 0.9588261 
@@ -442,19 +455,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 </div>
 <div id="sanity-check" class="section level2">
 <h2>Sanity check</h2>
-<p>Ist this code actually performing the cube-rooting?</p>
+<p>Is this code actually performing the cube-rooting?</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">all.equal</span>(x<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">3</span>), b<span class="op">$</span>chosen_transform<span class="op">$</span>x.t)</a></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<pre><code>## [1] &quot;Mean relative difference: 1.031018&quot;</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">all.equal</span>(x<span class="op">^</span>(<span class="dv">1</span><span class="op">/</span><span class="dv">3</span>), <span class="kw">predict</span>(b))</a></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<pre><code>## [1] &quot;Mean relative difference: 1.031018&quot;</code></pre>
 <p>It does indeed.</p>
 </div>
 </div>
 <div id="using-custom-normalization-statistics" class="section level1">
 <h1>Using custom normalization statistics</h1>
-<p>The bestNormalize package can estimate any statistic using its CV framework. A user-defined function can be passed in through the <code>norm_stat_fn</code> argument, and this function will then be applied in lieu of the Pearson test statistic divided by its degree of freedom.</p>
+<p>The bestNormalize package can estimate any univariate statistic using its CV framework. A user-defined function can be passed in through the <code>norm_stat_fn</code> argument, and this function will then be applied in lieu of the Pearson test statistic divided by its degree of freedom.</p>
 <p>The user-defined function must take an argument <code>x</code>, which indicates the data on which a user wants to evaluate the statistic.</p>
-<p>Here is an example using Lillifors (Kolmogorov-Smirnov) normality test statistic:</p>
+<p>Here is an example using Lilliefors (Kolmogorov-Smirnov) normality test statistic:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">bestNormalize</span>(x, <span class="dt">norm_stat_fn =</span> <span class="cf">function</span>(x) nortest<span class="op">::</span><span class="kw">lillie.test</span>(x)<span class="op">$</span>stat)</a></code></pre></div>
 <pre><code>## Best Normalizing transformation with 100 Observations
 ##  Estimated Normality Statistics (using custom normalization statistic)
@@ -495,8 +508,8 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 ##  - sd (before standardization) = 13.66084</code></pre>
 <p>Note: <code>bestNormalize</code> will attempt to minimize this statistic by default, which is definitely not what you want to do when calculating the p-value. This is seen in the example above, as the WORST normalization transformation is chosen.</p>
 <p>In this case, a user is advised to either manually select the best one:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">best_tranform &lt;-<span class="st"> </span><span class="kw">names</span>(<span class="kw">which.max</span>(dont_do_this<span class="op">$</span>norm_stats))</a>
-<a class="sourceLine" id="cb14-2" data-line-number="2">(do_this &lt;-<span class="st"> </span>dont_do_this<span class="op">$</span>other_transforms[[best_tranform]])</a></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">best_transform &lt;-<span class="st"> </span><span class="kw">names</span>(<span class="kw">which.max</span>(dont_do_this<span class="op">$</span>norm_stats))</a>
+<a class="sourceLine" id="cb14-2" data-line-number="2">(do_this &lt;-<span class="st"> </span>dont_do_this<span class="op">$</span>other_transforms[[best_transform]])</a></code></pre></div>
 <pre><code>## Standardized sqrt(x + a) Transformation with 100 nonmissing obs.:
 ##  Relevant statistics:
 ##  - a = 0 

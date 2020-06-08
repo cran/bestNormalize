@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ryan A Peterson" />
 
-<meta name="date" content="2020-05-20" />
+<meta name="date" content="2020-06-08" />
 
 <title>Using the bestNormalize Package</title>
 
@@ -301,9 +301,30 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Using the bestNormalize Package</h1>
 <h4 class="author">Ryan A Peterson</h4>
-<h4 class="date">2020-05-20</h4>
+<h4 class="date">2020-06-08</h4>
 
 
+<div id="TOC">
+<ul>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#methods">Methods</a><ul>
+<li><a href="#the-lambert-w-x-f-transformation">The Lambert W x F transformation</a></li>
+<li><a href="#the-box-cox-tranformation">The Box Cox tranformation</a></li>
+<li><a href="#the-yeo-johnson-transformation">The Yeo-Johnson transformation</a></li>
+<li><a href="#the-ordered-quantile-technique">The Ordered Quantile technique</a></li>
+<li><a href="#other-included-transformations">Other included transformations</a></li>
+<li><a href="#other-not-included-transformations">Other not-included transformations</a></li>
+<li><a href="#selecting-the-best-technique">Selecting the best technique</a></li>
+</ul></li>
+<li><a href="#examples">Examples</a><ul>
+<li><a href="#basic-implementation">Basic Implementation</a></li>
+<li><a href="#visualizing-out-of-sample-estimates-of-normality">Visualizing out-of-sample estimates of normality</a></li>
+<li><a href="#improving-speed-of-estimation">Improving speed of estimation</a></li>
+<li><a href="#leave-one-out-cv">Leave-one-out CV</a></li>
+</ul></li>
+<li><a href="#application-to-autotrader-data">Application to <code>autotrader</code> data</a></li>
+</ul>
+</div>
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
@@ -535,7 +556,7 @@ g(x) = \Phi ^{-1} \left(\frac{\text{rank} (x) - 1/2}{\text{length}(x) }\right)
 ##  - Log_b(x+a): 6.3392
 ##  - No transform: 6.5445
 ##  - orderNorm (ORQ): 1.1126
-##  - sqrt(x + a): NA
+##  - sqrt(x + a): 4.2794
 ##  - Yeo-Johnson: 4.2182
 ## Estimation method: Out-of-sample via CV with 5 folds and 1 repeats
 ##  
@@ -554,7 +575,7 @@ g(x) = \Phi ^{-1} \left(\frac{\text{rank} (x) - 1/2}{\text{length}(x) }\right)
 ##  - Log_b(x+a): 4.5358
 ##  - No transform: 21.8352
 ##  - orderNorm (ORQ): 0.9744
-##  - sqrt(x + a): NA
+##  - sqrt(x + a): 7.1273
 ##  - Yeo-Johnson: 4.0185
 ## Estimation method: Out-of-sample via CV with 5 folds and 1 repeats
 ##  
