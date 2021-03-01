@@ -28,7 +28,7 @@ There are many instances where researchers may want to normalize a variable:
 
 This package is designed to make this normalization transformation as effortless and consistent as possible. This package also introduces Ordered Quantile (ORQ) normalization via `orderNorm`, a normalization technique based off of a rank mapping to the normal distribution, which *guarantees* normally distributed transformed data (if ties are not present). We show in the accompanying paper that ORQ normalization performs very consistently across different distributions. It is able to successfully transform left/right skewed data, multimodal data, and even data generated from a Cauchy distribution (efficacy of transformation was tested on out-of-sample data).
 
-All of the transformations contained in this package and implemented in `bestNormalize` are reversible (i.e., 1-1), which allows for straight-forward interpretation and consistency. In other words, any analysis performed on the normalized data can be interpreted using the original unit (see application). Note though that changing the `type = "s"` argument in the `lambert` function may lead to a transformation that is not 1-1, so this method is not yet included in the various methods estimated by the `bestNormalize` function.
+The transformations contained in this package and implemented in `bestNormalize` are reversible (i.e., 1-1), which allows for straight-forward interpretation and consistency. In other words, any analysis performed on the normalized data can be interpreted using the original unit (see application). 
 
 # Methods
 
@@ -41,8 +41,6 @@ The Lambert W x F transformation, proposed by Goerg and implemented in the `Lamb
 One of the package's main functions is `Gaussianize`, which is similar in spirit to the purpose of this package. However, I have found in practice that often times, this method does not perform as well as the Box Cox or the Yeo-Johnson transformation.
 
 This transformations can handle three types of transformations: skewed, heavy-tailed, and skewed heavy-tailed. For more details on this transformation, consult the documentation for the `Lambert W` package.
-
-Note: As of version 1.2.0, the Lambert transformation is not performed by default in `bestNormalize` since it was using too many threads on Linux and Solaris to pass CRAN checks. It can be turned back on via the `allow_lambert` argument.  
 
 ## The Box Cox tranformation
 
@@ -251,6 +249,41 @@ This speed-up is dependent on the number of repeats, the length of the vector to
 
 As of version 1.3, `bestNormalize` has the `loo` argument, which if set to `TRUE` will compute the leave-one-out cross-validation transformations for each observation and method. Instead of the out-of-sample estimates for normality being the mean of the values over repeated folds, now the estimate for normality is simply calculated for the distribution of leave-one-out transformed values. This is computationally difficult, so it also works with the `cluster` argument if desired. 
 
+## Visualizing transformations in `ggplot2` with `scales` package
+
+As of version 1.7, users can use the `scales` package in conjunction with `ggplot2` to facilitate plotting variables that have undergone a transformation with `bestNormalize` (or any other method). 
+
+```{r scales_ex}
+library(ggplot2)
+
+x <- rgamma(1000, 1, .1)
+bn <- bestNormalize(x)
+
+bn
+
+# say y is related linearly to the transformed x
+y <- bn$x.t * 1 + rnorm(1000)
+
+# A log transformation does OK...
+ggplot(data.frame(x=x,y=y), aes(x, y)) +
+  geom_point() + 
+  scale_x_continuous(trans = "log", breaks = scales::log_breaks())
+
+# Create bestNormalize scale for use in ggplot (using bestNormalize object)
+bn_trans <- scales::trans_new(
+  name = "bn_trans",
+  trans = function(x) predict(bn, newdata = x),
+  inverse = function(x) predict(bn, newdata = x, inverse = TRUE)
+)
+
+
+ggplot(data.frame(x=x,y=y), aes(x, y)) +
+  geom_point() + 
+  scale_x_continuous(trans = bn_trans)
+
+```
+
+
 # Application to `autotrader` data
 
 The `autotrader` data set was scraped from the [autotrader website](https://www.autotrader.com/) as part of this package (and because at the time of writing, I needed to buy a car). I apply the `bestNormalize` functionality to de-skew mileage, age, and price in my pricing model. See `?autotrader` for more information on this data set.
@@ -399,3 +432,5 @@ legend(
   bty = "n"
   )
 ```
+
+ 

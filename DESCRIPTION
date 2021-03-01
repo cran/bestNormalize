@@ -1,8 +1,8 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.6.1
-Date: 2020-06-08
+Version: 1.7.0
+Date: 2021-03-01
 Authors@R: person("Ryan Andrew", "Peterson", 
                   email = "ryan.a.peterson@cuanschutz.edu", 
                   role = c("aut", "cre"))
@@ -17,22 +17,24 @@ Description: Estimate a suite of normalizing transformations, including
     transformation for a vector consistently and accurately. It implements 
     the Box-Cox transformation, the Yeo-Johnson transformation, three types 
     of Lambert WxF transformations, and the ordered quantile normalization 
-    transformation. It also estimates the normalization efficacy of other
-    commonly used transformations, and finally it allows users to specify 
-    custom transformations or normalization statistics.
+    transformation. It estimates the normalization efficacy of other
+    commonly used transformations, and it allows users to specify 
+    custom transformations or normalization statistics. Finally, functionality
+    can be integrated into a machine learning workflow via recipes. 
 URL: https://github.com/petersonR/bestNormalize
 License: GPL-3
 Depends: R (>= 3.1.0)
 Imports: LambertW (>= 0.6.5), nortest, dplyr, doParallel, foreach,
-        doRNG, recipes, tibble, methods
-Suggests: knitr, rmarkdown, MASS, testthat, mgcv, parallel
+        doRNG, recipes, tibble, methods, butcher, purrr
+Suggests: knitr, rmarkdown, MASS, testthat, mgcv, parallel, ggplot2,
+        scales, rlang
 VignetteBuilder: knitr
 LazyData: true
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2020-06-08 18:58:35 UTC; ryanpeterson
+Packaged: 2021-03-01 21:46:10 UTC; ryanpeterson
 Author: Ryan Andrew Peterson [aut, cre]
 Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
 Repository: CRAN
-Date/Publication: 2020-06-08 19:40:02 UTC
+Date/Publication: 2021-03-01 23:10:07 UTC

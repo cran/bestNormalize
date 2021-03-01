@@ -9,10 +9,10 @@
 #'
 #' @param x A vector to normalize
 #' @param allow_orderNorm set to FALSE if orderNorm should not be applied
-#' @param allow_lambert_s Set to TRUE if the lambertW of type "s"  should be
-#'   applied (see details)
+#' @param allow_lambert_s Set to FALSE if the lambertW of type "s"  should not be
+#'   applied (see details). Expect about 2-3x elapsed computing time if TRUE.
 #' @param allow_lambert_h Set to TRUE if the lambertW of type "h"  should be
-#'   applied (see details)
+#'   applied (see details). Expect about 2-3x elapsed computing time. 
 #' @param allow_exp Set to TRUE if the exponential transformation should be
 #'   applied (sometimes this will cause errors with heavy right skew)
 #' @param standardize If TRUE, the transformed values are also centered and
@@ -84,17 +84,8 @@
 #'   \code{cl} argument.
 #'
 #'
-#'   NOTE: Only the Lambert technique of type = "s" (skew) ensures that the
-#'   transformation is consistently 1-1, so it is the only method currently used
-#'   in \code{bestNormalize()}. Use type = "h" or type = 'hh' at risk of not
-#'   having this estimate 1-1 transform. These alternative types are effective
-#'   when the data has exceptionally heavy tails, e.g. the Cauchy distribution.
-#'   Additionally, as of v. 1.2.0, Lambert of type "s" is not used by default in
-#'   \code{bestNormalize()} since it uses multiple threads on some Linux
-#'   systems, which is not allowed on CRAN checks. Set allow_lambert_s = TRUE in
-#'   order to test this transformation as well. Note that the Lambert of type
-#'   "h" can also be done by setting allow_lambert_h = TRUE, however this can
-#'   take significantly longer to run.
+#'   Note that the Lambert transformation of type "h" can be done by setting
+#'   allow_lambert_h = TRUE, however this can take significantly longer to run.
 #'
 #'   Use \code{tr_opts} in order to set options for each transformation. For
 #'   instance, if you want to overide the default a selection for \code{log_x},
@@ -162,6 +153,10 @@ bestNormalize <- function(x, standardize = TRUE,
   methods <- c("no_transform", "arcsinh_x", 'boxcox', 
                "log_x", "sqrt_x", 'yeojohnson')
   
+  # Change no transform to center_scale if standardize = T
+  if(standardize)
+    methods <- gsub("no_transform", "center_scale", methods)
+  
   if(allow_exp) 
     methods <- c(methods, "exp_x")
   if (allow_orderNorm) 
@@ -204,7 +199,7 @@ bestNormalize <- function(x, standardize = TRUE,
   })
   
   method_names <- methods
-  method_calls <- gsub("_s|_h", "", methods)
+  method_calls <- gsub("lambert_s|lambert_h", "lambert", methods)
   names(args) <- methods
   
   ## Set transformation options (if any)
@@ -233,7 +228,7 @@ bestNormalize <- function(x, standardize = TRUE,
 
   # Select methods that worked
   method_names <- names(x.t)
-  method_calls <- gsub("_s|_h", "", method_names)
+  method_calls <- gsub("lambert_s|lambert_h", "lambert", method_names)
   
   # Normality statistic if not specified
   if(!length(norm_stat_fn)) {
@@ -254,14 +249,18 @@ bestNormalize <- function(x, standardize = TRUE,
     if(!loo) {
       k <- as.integer(k)
       r <- as.integer(r)
-      oos_est <- get_oos_estimates(x, standardize, method_names, k, r, cluster, quiet, warn, args, new_transforms, norm_stat_fn)
+      oos_est <- get_oos_estimates(x, standardize, method_names, k, r, 
+                                   cluster, quiet, warn, args, new_transforms, 
+                                   norm_stat_fn)
       oos_preds <- oos_est$oos_preds
       norm_stats <- oos_est$norm_stats
       best_idx <- names(which.min(norm_stats))
       method <- paste("Out-of-sample via CV with", k, "folds and", r, "repeats")
     } else {
       ## Leave one out CV
-      loo_est <- get_loo_estimates(x, standardize, method_names, cluster, quiet, args, new_transforms, norm_stat_fn)
+      loo_est <- get_loo_estimates(x, standardize, method_names, 
+                                   cluster, quiet, warn, args, new_transforms, 
+                                   norm_stat_fn)
       oos_preds <- loo_est$oos_preds
       norm_stats <- loo_est$norm_stats
       best_idx <- names(which.min(norm_stats))
@@ -317,7 +316,8 @@ print.bestNormalize <- function(x, ...) {
     "no_transform" = "No transform",
     "orderNorm" = "orderNorm (ORQ)",
     "sqrt_x" = "sqrt(x + a)",
-    "yeojohnson" = "Yeo-Johnson"
+    "yeojohnson" = "Yeo-Johnson",
+    "center_scale" = "Center+scale"
   )
   
   normnames <- names(x$norm_stats)
@@ -340,17 +340,45 @@ print.bestNormalize <- function(x, ...) {
   print(x$chosen_transform)
 }
 
+#' @rdname bestNormalize
+#' @param x A `bestNormalize` object.
+#' @importFrom tibble tibble
+#' @export
+tidy.bestNormalize <- function(x) {
+  
+  chosen_name <- class(x$chosen_transform)[1]
+  chosen_tr <- x$chosen_transform
+  chosen <- list(chosen_tr)
+  names(chosen)[1] <- chosen_name
+  
+  method_names <- names(x$norm_stats)
+  other_method_names <- method_names[method_names!= chosen_name]
+  
+  value <- tibble(
+    "transform" = c(chosen_name, other_method_names),
+    "tr_object" = c(chosen, x$other_transforms),
+    "norm_stat" = x$norm_stats[c(chosen_name, other_method_names)],
+    "chosen" = c(1, rep(0, length(other_method_names)))
+  )
+}
+
+
 # Get out-of-sample normality statistics via repeated CV
 #' @importFrom doParallel registerDoParallel
 #' @importFrom doRNG "%dorng%"
 #' @importFrom methods is
 #' @importFrom foreach foreach
-get_oos_estimates <- function(x, standardize, norm_methods, k, r, cluster, quiet, warn, args, new_transforms, norm_stat_fn) {
+get_oos_estimates <- function(x, standardize, norm_methods, k, r, 
+                              cluster, quiet, warn, args, new_transforms, 
+                              norm_stat_fn) {
   x <- x[!is.na(x)]
   fold_size <- floor(length(x) / k)
-  if(fold_size < 20 & warn) warning("fold_size is ", fold_size, " (< 20), therefore P/df estimates may be off") 
+  if(fold_size < 20 & warn) 
+    warning("CV fold size is ", fold_size, " (< 20), therefore P/df estimates may be off") 
+  if (fold_size < 3) 
+    stop("Cannot do k-fold CV with fold size < 3; decrease k, set loo = TRUE, or out_of_sample = FALSE")
   method_names <- norm_methods
-  method_calls <- gsub("_s|_h", "", method_names)
+  method_calls <- gsub("lambert_s|lambert_h", "lambert", method_names)
   
   # Perform in this session if cluster unspecified
   if(is.null(cluster)) {
@@ -446,11 +474,12 @@ create_folds <- function(x, k) {
 #' @importFrom foreach %dopar%
 #' @importFrom foreach foreach
 #' @importFrom methods is
-get_loo_estimates <- function(x, standardize, norm_methods, cluster, quiet, args, new_transforms, norm_stat_fn) {
+get_loo_estimates <- function(x, standardize, norm_methods, cluster, quiet, warn, 
+                              args, new_transforms, norm_stat_fn) {
   x <- x[!is.na(x)]
   n <- length(x)
   method_names <- norm_methods
-  method_calls <- gsub("_s|_h", "", method_names)
+  method_calls <- gsub("lambert_s|lambert_h", "lambert", method_names)
   
   # Perform in this session if cluster unspecified
   if(is.null(cluster)) {

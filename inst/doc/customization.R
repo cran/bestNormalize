@@ -103,7 +103,7 @@ custom_transform <- list(
 
 set.seed(123129)
 x <- rgamma(100, 1, 1)
-(b <- bestNormalize(x = x, new_transforms = custom_transform))
+(b <- bestNormalize(x = x, new_transforms = custom_transform, standardize = FALSE))
 
 ## -----------------------------------------------------------------------------
 all.equal(x^(1/3), b$chosen_transform$x.t)

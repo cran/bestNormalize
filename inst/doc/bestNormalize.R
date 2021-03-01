@@ -87,6 +87,35 @@ axis(2, at=log10(c(.1,.5, 1, 2, 5, 10)), labels=c(.1,.5, 1, 2, 5, 10))
 ## ----bn_output----------------------------------------------------------------
 bestNormalize(x, allow_orderNorm = FALSE, out_of_sample = FALSE)
 
+## ----scales_ex----------------------------------------------------------------
+library(ggplot2)
+
+x <- rgamma(1000, 1, .1)
+bn <- bestNormalize(x)
+
+bn
+
+# say y is related linearly to the transformed x
+y <- bn$x.t * 1 + rnorm(1000)
+
+# A log transformation does OK...
+ggplot(data.frame(x=x,y=y), aes(x, y)) +
+  geom_point() + 
+  scale_x_continuous(trans = "log", breaks = scales::log_breaks())
+
+# Create bestNormalize scale for use in ggplot (using bestNormalize object)
+bn_trans <- scales::trans_new(
+  name = "bn_trans",
+  trans = function(x) predict(bn, newdata = x),
+  inverse = function(x) predict(bn, newdata = x, inverse = TRUE)
+)
+
+
+ggplot(data.frame(x=x,y=y), aes(x, y)) +
+  geom_point() + 
+  scale_x_continuous(trans = bn_trans)
+
+
 ## ----load_appdata-------------------------------------------------------------
 data("autotrader")
 autotrader$yearsold <- 2017 - autotrader$Year
