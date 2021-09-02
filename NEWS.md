@@ -1,3 +1,8 @@
+# bestNormalize 1.8.1
+- update citation (new R Journal publication!)
+- fix/add features to `tidy` method to work more generally, provide easy access to 
+  chosen transformations (responding to [issue 9](https://github.com/petersonR/bestNormalize/issues/9))
+
 # bestNormalize 1.8.0
 
 - added packagedown website here: https://petersonr.github.io/bestNormalize

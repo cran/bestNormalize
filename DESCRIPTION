@@ -1,8 +1,8 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.8.0
-Date: 2021-06-02
+Version: 1.8.1
+Date: 2021-09-01
 Authors@R: person("Ryan Andrew", "Peterson", 
                   email = "ryan.a.peterson@cuanschutz.edu", 
                   role = c("aut", "cre"))
@@ -34,8 +34,8 @@ LazyData: true
 RoxygenNote: 7.1.1
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2021-06-02 23:54:02 UTC; ryanpeterson
+Packaged: 2021-09-01 20:19:31 UTC; ryanpeterson
 Author: Ryan Andrew Peterson [aut, cre]
 Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
 Repository: CRAN
-Date/Publication: 2021-06-03 11:20:02 UTC
+Date/Publication: 2021-09-02 14:50:45 UTC
