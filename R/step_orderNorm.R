@@ -2,9 +2,9 @@
 #'
 #' @description `step_orderNorm` creates a specification of a recipe step (see
 #'   `recipes` package) that will transform data using the ORQ (orderNorm)
-#'   transformation, which approximates the "true" normalizing tranformation if
+#'   transformation, which approximates the "true" normalizing transformation if
 #'   one exists. This is considerably faster than `step_bestNormalize`.
-#'
+#'   
 #' @param recipe A formula or recipe
 #' @param ... One or more selector functions to choose which variables are
 #'   affected by the step. See [selections()] for more details. For the `tidy`
@@ -103,9 +103,9 @@ step_orderNorm_new <-
   }
 
 #' @export
-#' @importFrom recipes prep terms_select check_type
+#' @importFrom recipes prep recipes_eval_select check_type
 prep.step_orderNorm <- function(x, training, info = NULL, ...) {
-  col_names <- terms_select(x$terms, info = info)
+  col_names <- recipes_eval_select(x$terms, training, info)
   check_type(training[, col_names])
   
   values <- apply(
@@ -141,11 +141,11 @@ bake.step_orderNorm <- function(object, new_data, ...) {
 }
 
 #' @export
-#' @importFrom recipes printer
+#' @importFrom recipes print_step
 print.step_orderNorm <-
   function(x, width = max(20, options()$width - 35), ...) {
-    cat("orderNorm transformation on ", sep = "")
-    printer(names(x$transform_info), x$terms, x$trained, width = width)
+    title <- "orderNorm transformation on "
+    print_step(names(x$transform_info), x$terms, x$trained, width = width, title = title)
     invisible(x)
   }
 

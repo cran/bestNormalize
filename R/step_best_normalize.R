@@ -102,9 +102,9 @@ step_best_normalize_new <-
   }
 
 #' @export
-#' @importFrom recipes prep terms_select check_type
+#' @importFrom recipes prep recipes_eval_select check_type
 prep.step_best_normalize <- function(x, training, info = NULL, ...) {
-  col_names <- terms_select(x$terms, info = info)
+  col_names <- recipes_eval_select(x$terms, training, info)
   check_type(training[, col_names])
   
   values <- apply(
@@ -140,11 +140,11 @@ bake.step_best_normalize <- function(object, new_data, ...) {
   as_tibble(new_data)
 }
 #' @export
-#' @importFrom recipes printer
+#' @importFrom recipes print_step
 print.step_best_normalize <-
   function(x, width = max(20, options()$width - 35), ...) {
-    cat("bestNormalize transformation on ", sep = "")
-    printer(names(x$transform_info), x$terms, x$trained, width = width)
+    title <- "bestNormalize transformation on "
+    print_step(names(x$transform_info), x$terms, x$trained, width = width, title = title)
     invisible(x)
   }
 
