@@ -164,11 +164,12 @@ summary(fit4)
 
 miles.t <- predict(mileageBN, newdata = mileage.xx)
 c1 <- coef(fit4)["mileage.t"]
+plot_idx <- sample(1:nrow(autotrader), size = 1000)
 
 par(mfrow = c(1, 1))
 plot(
-    mileageBN$x.t,
-    priceBN$x.t,
+    mileageBN$x.t[plot_idx],
+    priceBN$x.t[plot_idx],
     pch = 16,
     col = grey(.1, alpha = .2),
     main = "Estimated linear effect (using transformed data)",
@@ -182,8 +183,8 @@ lines(miles.t,
 
 ## Mileage effect
 plot(
-  autotrader$mileage,
-  autotrader$price,
+  autotrader$mileage[plot_idx],
+  autotrader$price[plot_idx],
   pch = 16,
   col = grey(.1, alpha = .2),
   main = "Mileage effect (re-transformed to original unit)",
@@ -216,8 +217,8 @@ yo.t <- predict(yearsoldBN, newdata = yearsold.xx)
 c2 <- coef(fit4)["yearsold.t"]
 
 plot(
-    jitter(autotrader$yearsold, 1.5),
-    autotrader$price,
+    jitter(autotrader$yearsold[plot_idx], 1.5),
+    autotrader$price[plot_idx],
     pch = 16,
     col = grey(.1, alpha = .2), 
     main = "Years old effect (re-transformed to original unit)",

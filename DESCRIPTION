@@ -1,8 +1,8 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.8.3
-Date: 2022-06-13
+Version: 1.9.0
+Date: 2023-03-15
 Authors@R: person("Ryan Andrew", "Peterson", 
                   email = "ryan.a.peterson@cuanschutz.edu", 
                   role = c("aut", "cre"), 
@@ -27,17 +27,17 @@ URL: https://petersonr.github.io/bestNormalize/,
 License: GPL-3
 Depends: R (>= 3.1.0)
 Imports: LambertW (>= 0.6.5), nortest, dplyr, doParallel, foreach,
-        doRNG, recipes, tibble, methods, butcher, purrr
+        doRNG, recipes, tibble, methods, butcher, purrr, generics
 Suggests: knitr, rmarkdown, MASS, testthat, mgcv, parallel, ggplot2,
         scales, rlang, covr
 VignetteBuilder: knitr
 LazyData: true
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.3
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2022-06-13 20:25:39 UTC; ryanpeterson
+Packaged: 2023-03-15 20:53:24 UTC; rpterson
 Author: Ryan Andrew Peterson [aut, cre]
     (<https://orcid.org/0000-0002-4650-5798>)
 Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
 Repository: CRAN
-Date/Publication: 2022-06-13 20:50:02 UTC
+Date/Publication: 2023-03-15 21:20:02 UTC

@@ -1,3 +1,10 @@
+# bestNormalize 1.9.0
+
+- Add an S3 methods that helps `step_orderNorm()` to work with parallel processing. 
+- Add an S3 methods that helps `step_best_normalize()` to work with parallel processing. 
+- Add a new transformation: the double reversed log (@rempsyc #18)
+- Fix issues in CRAN checks
+
 # bestNormalize 1.8.3
 
 - updating print functionality to remain compatible with recipes. 

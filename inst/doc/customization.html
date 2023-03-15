@@ -12,7 +12,7 @@
 
 <meta name="author" content="Ryan A Peterson" />
 
-<meta name="date" content="2022-06-13" />
+<meta name="date" content="2023-03-15" />
 
 <title>Customization within bestNormalize</title>
 
@@ -122,13 +122,20 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   for (var i = 0; i < sheets.length; i++) {
     if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
     try { var rules = sheets[i].cssRules; } catch (e) { continue; }
-    for (var j = 0; j < rules.length; j++) {
+    var j = 0;
+    while (j < rules.length) {
       var rule = rules[j];
       // check if there is a div.sourceCode rule
-      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -334,22 +341,23 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 <h1 class="title toc-ignore">Customization within bestNormalize</h1>
 <h4 class="author">Ryan A Peterson</h4>
-<h4 class="date">2022-06-13</h4>
+<h4 class="date">2023-03-15</h4>
 
 
 <div id="TOC">
 <ul>
-<li><a href="#custom-functions-with-bestnormalize">Custom functions with
+<li><a href="#custom-functions-with-bestnormalize" id="toc-custom-functions-with-bestnormalize">Custom functions with
 bestNormalize</a>
 <ul>
-<li><a href="#example-cube-root">Example: cube-root</a></li>
-<li><a href="#s3-methods">S3 methods</a></li>
-<li><a href="#optional-print-method">Optional: print method</a></li>
-<li><a href="#implementing-with-bestnormalize">Implementing with
+<li><a href="#example-cube-root" id="toc-example-cube-root">Example:
+cube-root</a></li>
+<li><a href="#s3-methods" id="toc-s3-methods">S3 methods</a></li>
+<li><a href="#optional-print-method" id="toc-optional-print-method">Optional: print method</a></li>
+<li><a href="#implementing-with-bestnormalize" id="toc-implementing-with-bestnormalize">Implementing with
 bestNormalize</a></li>
-<li><a href="#sanity-check">Sanity check</a></li>
+<li><a href="#sanity-check" id="toc-sanity-check">Sanity check</a></li>
 </ul></li>
-<li><a href="#using-custom-normalization-statistics">Using custom
+<li><a href="#using-custom-normalization-statistics" id="toc-using-custom-normalization-statistics">Using custom
 normalization statistics</a></li>
 </ul>
 </div>
@@ -491,6 +499,7 @@ it’s easy to model your code after it. For instance, for
 ##  - arcsinh(x): 1.2347
 ##  - Box-Cox: 1.0267
 ##  - cuberoot_x: 0.9787
+##  - Double Reversed Log_b(x+a): 2.4507
 ##  - Exp(x): 4.7947
 ##  - Log_b(x+a): 1.3547
 ##  - No transform: 2.0027
@@ -535,6 +544,7 @@ test statistic:</p>
 ##  - arcsinh(x): 0.1958
 ##  - Box-Cox: 0.1785
 ##  - Center+scale: 0.2219
+##  - Double Reversed Log_b(x+a): 0.2624
 ##  - Exp(x): 0.3299
 ##  - Log_b(x+a): 0.1959
 ##  - orderNorm (ORQ): 0.186
@@ -556,6 +566,7 @@ test’s p-value:</p>
 ##  - arcsinh(x): 0.4327
 ##  - Box-Cox: 0.4831
 ##  - Center+scale: 0.2958
+##  - Double Reversed Log_b(x+a): 0.2028
 ##  - Exp(x): 0.0675
 ##  - Log_b(x+a): 0.3589
 ##  - orderNorm (ORQ): 0.4492
@@ -589,6 +600,7 @@ subtracting it from 1):</p>
 ##  - arcsinh(x): 0.5166
 ##  - Box-Cox: 0.4191
 ##  - Center+scale: 0.6521
+##  - Double Reversed Log_b(x+a): 0.8005
 ##  - Exp(x): 0.9601
 ##  - Log_b(x+a): 0.5338
 ##  - orderNorm (ORQ): 0.4646
