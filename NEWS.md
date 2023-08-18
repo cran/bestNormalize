@@ -1,7 +1,15 @@
+# bestNormalize 1.9.1
+
+- New function, `bestLogConstant`, that uses the same machinery to pick the best 
+  value of a constant to use when logging a variable, e.g. the one that makes 
+  the distribution look the most normal, especially useful for non-positive or 
+  zero-inflated data. Currently experimental. 
+- Taking out tests that failed due to dependent package update (does not impact default bestNormalize behavior). See (issue)[https://github.com/gmgeorg/LambertW/issues/3]. 
+
 # bestNormalize 1.9.0
 
-- Add an S3 methods that helps `step_orderNorm()` to work with parallel processing. 
-- Add an S3 methods that helps `step_best_normalize()` to work with parallel processing. 
+- Add S3 methods that helps `step_orderNorm()` to work with parallel processing. 
+- Add S3 methods that helps `step_best_normalize()` to work with parallel processing. 
 - Add a new transformation: the double reversed log (@rempsyc #18)
 - Fix issues in CRAN checks
 
