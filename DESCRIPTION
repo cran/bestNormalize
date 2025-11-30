@@ -1,10 +1,10 @@
 Package: bestNormalize
 Type: Package
 Title: Normalizing Transformation Functions
-Version: 1.9.1
-Date: 2023-08-17
-Authors@R: person("Ryan Andrew", "Peterson", 
-                  email = "ryan.a.peterson@cuanschutz.edu", 
+Version: 1.9.2
+Date: 2025-11-29
+Authors@R: person("Ryan A", "Peterson", 
+                  email = "ryan-peterson@uiowa.edu", 
                   role = c("aut", "cre"), 
                   comment = c(ORCID = "0000-0002-4650-5798"))
 Description: Estimate a suite of normalizing transformations, including 
@@ -27,17 +27,18 @@ URL: https://petersonr.github.io/bestNormalize/,
 License: GPL-3
 Depends: R (>= 3.1.0)
 Imports: LambertW (>= 0.6.5), nortest, dplyr, doParallel, foreach,
-        doRNG, recipes, tibble, methods, butcher, purrr, generics
+        doRNG, recipes, tibble, methods, butcher, purrr, progress,
+        generics
 Suggests: knitr, rmarkdown, MASS, testthat, mgcv, parallel, ggplot2,
         scales, rlang, covr
 VignetteBuilder: knitr
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 Encoding: UTF-8
 NeedsCompilation: no
-Packaged: 2023-08-17 20:58:25 UTC; ryanpeterson
-Author: Ryan Andrew Peterson [aut, cre]
-    (<https://orcid.org/0000-0002-4650-5798>)
-Maintainer: Ryan Andrew Peterson <ryan.a.peterson@cuanschutz.edu>
+Packaged: 2025-11-29 21:21:52 UTC; rpterson
+Author: Ryan A Peterson [aut, cre] (ORCID:
+    <https://orcid.org/0000-0002-4650-5798>)
+Maintainer: Ryan A Peterson <ryan-peterson@uiowa.edu>
 Repository: CRAN
-Date/Publication: 2023-08-18 08:42:33 UTC
+Date/Publication: 2025-11-30 17:10:15 UTC

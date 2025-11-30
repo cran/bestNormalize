@@ -9,10 +9,10 @@
 #'
 #' @param x A vector to normalize
 #' @param allow_orderNorm set to FALSE if orderNorm should not be applied
-#' @param allow_lambert_s Set to FALSE if the lambertW of type "s"  should not be
-#'   applied (see details). Expect about 2-3x elapsed computing time if TRUE.
-#' @param allow_lambert_h Set to TRUE if the lambertW of type "h"  should be
-#'   applied (see details). Expect about 2-3x elapsed computing time. 
+#' @param allow_lambert_s Set to FALSE if the lambertW of type "s"  should not
+#'   be applied (see details). Expect about 2-3x elapsed computing time if TRUE.
+#' @param allow_lambert_h Set to TRUE if the lambertW of type "h"  and "hh"
+#'   should be applied (see details). Expect about 2-4x elapsed computing time.
 #' @param allow_exp Set to TRUE if the exponential transformation should be
 #'   applied (sometimes this will cause errors with heavy right skew)
 #' @param standardize If TRUE, the transformed values are also centered and
@@ -84,8 +84,9 @@
 #'   \code{cl} argument.
 #'
 #'
-#'   Note that the Lambert transformation of type "h" can be done by setting
-#'   allow_lambert_h = TRUE, however this can take significantly longer to run.
+#'   Note that the Lambert transformation of type "h" or "hh" can be done by
+#'   setting allow_lambert_h = TRUE, however this can take significantly longer
+#'   to run.
 #'
 #'   Use \code{tr_opts} in order to set options for each transformation. For
 #'   instance, if you want to overide the default a selection for \code{log_x},
@@ -132,6 +133,9 @@
 #'
 #' @seealso  \code{\link[bestNormalize]{boxcox}}, \code{\link{orderNorm}},
 #'   \code{\link{yeojohnson}}
+#'   
+#' @importFrom progress progress_bar
+#' 
 #' @export
 bestNormalize <- function(x, 
                           standardize = TRUE, 
@@ -166,7 +170,7 @@ bestNormalize <- function(x,
   if(allow_lambert_s)
     methods <- c(methods, "lambert_s")
   if(allow_lambert_h)
-    methods <- c(methods, "lambert_h")
+    methods <- c(methods, "lambert_h", "lambert_hh")
   
   # Check for new methods
   if(length(new_transforms)) {
@@ -196,12 +200,14 @@ bestNormalize <- function(x,
       val[["type"]] <- "s"
     } else if(i == "lambert_h") {
       val[["type"]] <- "h"
-    } 
+    } else if(i == "lambert_hh") {
+      val[["type"]] <- "hh"
+    }
     val
   })
   
   method_names <- methods
-  method_calls <- gsub("lambert_s|lambert_h", "lambert", methods)
+  method_calls <- gsub("lambert_s|lambert_h|lambert_hh", "lambert", methods)
   names(args) <- methods
   
   ## Set transformation options (if any)
@@ -230,7 +236,7 @@ bestNormalize <- function(x,
 
   # Select methods that worked
   method_names <- names(x.t)
-  method_calls <- gsub("lambert_s|lambert_h", "lambert", method_names)
+  method_calls <- gsub("lambert_s|lambert_h|lambert_hh", "lambert", method_names)
   
   # Normality statistic if not specified
   if(!length(norm_stat_fn)) {
@@ -312,6 +318,7 @@ print.bestNormalize <- function(x, ...) {
     "arcsinh_x" = "arcsinh(x)",
     "boxcox" = "Box-Cox" ,
     "exp_x" = "Exp(x)",
+    "lambert_hh" = "Lambert's W (type hh)",
     "lambert_h" = "Lambert's W (type h)",
     "lambert_s" = "Lambert's W (type s)",
     "log_x" = "Log_b(x+a)",
@@ -387,7 +394,13 @@ get_oos_estimates <- function(x, standardize, norm_methods, k, r,
   # Perform in this session if cluster unspecified
   if(is.null(cluster)) {
     
-    if(!quiet & length(x) > 2000) pb <- dplyr::progress_estimated(r*k)
+    if(!quiet & length(x) > 2000) {
+      pb <- progress::progress_bar$new(
+        format = "  computing [:bar] :percent eta: :eta",
+        total  = k * r,
+        width  = 60
+      )
+    }
     
     reps <- lapply(1:r, function(rep) {
       resamples <- create_folds(x, k)
@@ -405,7 +418,7 @@ get_oos_estimates <- function(x, standardize, norm_methods, k, r,
             pstats[i, m] <- suppressWarnings(do.call(norm_stat_fn, list(x = vec)))
           }
         }
-        if(!quiet & length(x) > 2000) pb$tick()$print()
+        if(!quiet & length(x) > 2000) pb$tick()
       }
       colnames(pstats) <- norm_methods
       rownames(pstats) <- paste0("Rep", rep, "Fold", 1:k)
@@ -483,7 +496,7 @@ get_loo_estimates <- function(x, standardize, norm_methods, cluster, quiet, warn
   x <- x[!is.na(x)]
   n <- length(x)
   method_names <- norm_methods
-  method_calls <- gsub("lambert_s|lambert_h", "lambert", method_names)
+  method_calls <- gsub("lambert_s|lambert_h|lambert_hh", "lambert", method_names)
   
   # Perform in this session if cluster unspecified
   if(is.null(cluster)) {

@@ -3,7 +3,6 @@
 \docType{package}
 \name{bestNormalize-package}
 \alias{bestNormalize-package}
-\alias{_PACKAGE}
 \title{bestNormalize: Flexibly calculate the best normalizing transformation for a
 vector}
 \description{
@@ -22,6 +21,6 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Ryan Andrew Peterson \email{ryan.a.peterson@cuanschutz.edu} (\href{https://orcid.org/0000-0002-4650-5798}{ORCID})
+\strong{Maintainer}: Ryan A Peterson \email{ryan-peterson@uiowa.edu} (\href{https://orcid.org/0000-0002-4650-5798}{ORCID})
 
 }

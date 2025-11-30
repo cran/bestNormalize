@@ -1,3 +1,11 @@
+# bestNormalize 1.9.1.9000
+
+- Started testing `lambert` type transforms again.
+- adding `lambert` of type "hh" as option when `allow_lambert_h` is set to
+  `TRUE`, per request from 
+  [issue 24](https://github.com/petersonR/bestNormalize/issues/24)
+- fixing deprecation of `dplyr::progress_estimated` (#26)
+
 # bestNormalize 1.9.1
 
 - New function, `bestLogConstant`, that uses the same machinery to pick the best 
